@@ -1,0 +1,177 @@
+//main.c
+
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+#include "complex3.h"
+int main()
+{
+	struct complex *z1=NULL;
+	struct complex *z2=NULL;
+	struct complex *z3=NULL;
+
+	z1=complex_init();
+	z2=complex_init();
+	z3=complex_init();
+
+	printf("z1=%.2f+%.2fi\n",complex_get_real(z1),complex_get_imag(z1));
+	printf("z2=%.2f+%.2fi\n",complex_get_real(z2),complex_get_imag(z2));
+
+
+	
+	complex_set_real(z1,1.32);
+	complex_set_real(z2,3.63);
+	complex_set_imag(z1,3.71);
+	complex_set_imag(z2,-1.54);
+
+	printf("z1=%.2f+%.2fi\n",complex_get_real(z1),complex_get_imag(z1));
+	printf("z2=%.2f+%.2fi\n",complex_get_real(z2),complex_get_imag(z2));
+
+	complex_additive(z1,z2,z3);
+	printf("z1+z2=%.2f+%.2fi\n",complex_get_real(z3), complex_get_imag(z3));
+
+	complex_subtract(z1,z2,z3);
+	printf("z1 - z2 = %.2f + %.2fi\n",complex_get_real(z3), complex_get_imag(z3)); 
+
+	complex_multiply(z1,z2,z3);
+	printf("z1=%.2f+%.2fi\n",complex_get_real(z3), complex_get_imag(z3));
+
+	complex_divide(z1,z2,z3);
+	printf("z1=%.2f+%.2fi\n",complex_get_real(z3), complex_get_imag(z3));
+	return 0;
+}
+
+//complex.c
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+
+struct complex_node{
+	double a;
+	struct complex_node* next;
+};
+
+struct complex{
+	struct complex_node* head;
+};
+struct complex* complex_init(){
+	struct complex* z=NULL;
+	z=(struct complex* ) malloc (sizeof(struct complex));
+	z->head =(struct complex_node*) malloc (sizeof(struct complex_node));
+	if (z == NULL && z->head == NULL)
+		return NULL;
+	else
+	{
+		z->head->a=0.0;
+		z->head->next=(struct complex_node*) malloc (sizeof(struct complex_node));
+		if(z->head->next == NULL)
+			return NULL;
+		else
+		{
+			z->head->next->a=0.0;
+			z->head->next->next=NULL;
+		}
+	}
+	return z;
+}
+void complex_destroy(struct complex* z){
+	assert(z != NULL);
+	free(z->head->next->next);
+	free(z->head->next);
+	free(z->head);
+	free(z);
+	z= NULL;
+	
+}
+
+double complex_get_real(struct complex*z){
+	
+return z->head->a;
+
+}
+
+double complex_get_imag(struct complex*z){
+
+	return z->head->next->a;
+}
+
+void complex_set_imag(struct complex*z,double value2){
+
+	assert(z != NULL);
+	z->head->next->a=value2;
+}
+
+void complex_set_real(struct complex*z,double value1){
+
+	assert(z != NULL);
+		z->head->a=value1;
+}
+
+void complex_additive(struct complex*z1,struct complex*z2,struct complex*z3){
+
+	assert(z1 != NULL  && z2 != NULL  && z3 != NULL );
+		z3->head->a=	z1->head->a+	z2->head->a;
+	z3->head->next->a=z1->head->next->a +z2->head->next->a;
+
+}
+
+void complex_subtract(struct complex*z1,struct complex*z2,struct complex*z3){
+
+	assert(z1 != NULL  && z2 != NULL  && z3 != NULL);
+	z3->head->a=	z1->head->a  -	z2->head->a;
+	z3->head->next->a=z1->head->next->a  - z2->head->next->a;
+
+}
+
+void complex_multiply(struct complex*z1,struct complex*z2,struct complex*z3){
+
+
+	assert(z1 != NULL  && z2 != NULL && z3 != NULL);
+	z3->head->a=z1->head->a*(z2->head->a) -z1->head->next->a*(z2->head->next->a) ;
+	z3->head->next->a=z1->head->next->a*(z2->head->a) + z1->head->a*(z2->head->next->a);
+
+}
+
+void complex_divide(struct complex*z1,struct complex*z2,struct complex*z3){
+	assert(z1 != NULL  && z2 != NULL  && z3 != NULL);
+	z3->head->a =(z1->head->a * (z2->head->a)+z1->head->next->a *(z2->head->next->a))/
+(z2->head->a * (z2->head->a)+z2->head->next->a * (z2->head->next->a));
+
+	z3->head->next->a=(z1->head->next->a*(z2->head->a)- z1->head->a*(z2->head->next->a))/
+		(z2->head->a * (z2->head->a)+z2->head->next->a * (z2->head->next->a));
+}
+
+
+//complex.h
+
+#ifndef _COMPLEX_H_
+#define _COMPLEX_H_
+
+struct complex;
+
+struct complex* complex_init();
+
+void* complex_destroy(struct complex*);
+
+double complex_get_real(struct complex*z);
+
+double complex_get_imag(struct complex*z);
+
+void complex_set_imag(struct complex*z,double imag);
+
+void complex_set_real(struct complex*z,double real);
+
+void complex_additive(struct complex*z1,struct complex*z2,struct complex*z3);
+
+void complex_subtract(struct complex*z1,struct complex*z2,struct complex*z3);
+
+
+void complex_multiply(struct complex*z1,struct complex*z2,struct complex*z3);
+
+
+void complex_divide(struct complex*z1,struct complex*z2,struct complex*z3);
+
+#endif
